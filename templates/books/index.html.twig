@@ -9,12 +9,15 @@
 </style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ '/home/immigrationplan/public_html/src/Controller/BooksController.php'|file_link(0) }}">src/Controller/BooksController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/home/immigrationplan/public_html/templates/books/index.html.twig'|file_link(0) }}">templates/books/index.html.twig</a></code></li>
-    </ul>
+    {% for book in books %}
+        <li>
+            <p>Book:{{ book.title }}</p>
+            {% for author in book.authors %}
+                <li>{{ author.name }}</li>
+            {% endfor %}
+        </li>
+    {% else %}
+        No books have been found.
+    {% endfor %}
 </div>
 {% endblock %}

@@ -38,6 +38,19 @@ class BookRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    
+    public function findAllWithAuthors(): ?array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT b, a
+            FROM App\Entity\Book b
+            INNER JOIN b.authors a
+            ORDER BY b.id DESC'
+        )
+        ->setMaxResults(25);
+        return $query->getResult();
+    }
 
 //    /**
 //     * @return Book[] Returns an array of Book objects
