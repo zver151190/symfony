@@ -1,0 +1,2 @@
+[07-Sep-2022 02:51:50 UTC] PHP Fatal error:  Allowed memory size of 536870912 bytes exhausted (tried to allocate 12288 bytes) in /home/immigrationplan/public_html/vendor/fakerphp/faker/src/Faker/Provider/Base.php on line 202
+[07-Sep-2022 02:51:50 UTC] PHP Fatal error:  Allowed memory size of 536870912 bytes exhausted (tried to allocate 32768 bytes) in /home/immigrationplan/public_html/vendor/symfony/monolog-bridge/Formatter/ConsoleFormatter.php on line 1
