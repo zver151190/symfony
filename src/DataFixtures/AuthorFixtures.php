@@ -14,8 +14,8 @@ class AuthorFixtures extends Fixture
     
     public function load(ObjectManager $manager): void
     {
-        $this->faker = Factory::create("en_EN");
-        for($i = 1; $i < 11; $i++){
+        $this->faker = Factory::create("en_US");
+        for($i = 0; $i < 101; $i++){
             $author = new Author();
             $author->setName($this->faker->name);
             $manager->persist($author);
@@ -25,4 +25,5 @@ class AuthorFixtures extends Fixture
         }
         $manager->flush();
     }
+
 }

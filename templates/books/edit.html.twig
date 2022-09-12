@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<style>
+    .book-items td textarea {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+</style>
+<div class="container">
+    <div class="row book-items d-flex flex-wrap p-3">
+        <div id = "simpleform"> 
+            {% if form.vars.value.cover is not null %}
+                <img src="{{ form.vars.value.cover }}" height="250" class="mb-3" alt="book cover image"/>
+            {%else%}
+                <img src="/public/uploads/image-landscape.svg" height="250" class="mb-3" alt="book cover image"/>
+            {% endif %}
+            {% form_theme form 'bootstrap_5_layout.html.twig' %}
+            {{ form_start(form) }}
+            {{ form_widget(form) }} 
+            {{ form_end(form) }} 
+        </div>
+</div>
+<script>
+        function updateBook(){
+            var id = 445;
+            $.ajax({
+    			dataType: "json",
+                url: "/books/edit/"+id,
+                method: "POST",
+                data: $('form').serialize(),
+                success: function (data,status,xhr) {
+                    
+                },
+                error: function (jqXhr, textStatus, errorMessage) { 
+                }
+                    
+            });
+    }
+</script>
+{% endblock %}

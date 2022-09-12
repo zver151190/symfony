@@ -1,0 +1,22 @@
+@import "~bootstrap/scss/bootstrap";
+
+.badge {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    &:hover{
+        background: gray !important;
+        color: white !important;
+    }
+}
+.plus_circle{
+    background: red;
+    width: 18px;
+    display: inline-block;
+    height: 18px;
+    text-align: center;
+    color: white;
+    border-radius: 50%;
+    line-height: 16px;
+    cursor: pointer;
+}

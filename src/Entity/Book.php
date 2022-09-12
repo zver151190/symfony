@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
@@ -28,6 +29,7 @@ class Book
     private ?string $cover = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Positive]
     private ?int $publishYear = null;
 
     #[ORM\ManyToMany(targetEntity: Author::class, inversedBy: 'books')]
@@ -114,4 +116,5 @@ class Book
 
         return $this;
     }
+
 }
