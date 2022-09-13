@@ -39,6 +39,42 @@ class BookRepository extends ServiceEntityRepository
         }
     }
     
+    public function findByFilter($filters): ? array
+    {
+        $em = $this->getEntityManager();
+        $entityFields = $properties = $em->getClassMetadata('App\Entity\Book')->getFieldNames();
+        $entityFields['authors'] = 'authors';
+        $pass = [];
+        $columns = [];
+        $qb = $em->createQueryBuilder();
+        $hasWhere = false;
+        $qb->select('b,ba')
+            ->from('App\Entity\Book', 'b')
+            ->leftJoin('b.authors', 'ba');
+        foreach($filters as $filter){
+            if(in_array($filter['key'],$entityFields)){
+                if($filter['key'] == 'authors'){
+                    if($hasWhere){
+                        $qb->andWhere("ba.name LIKE '%{$filter['value']}%'");
+                    }else{
+                        $qb->where("ba.name LIKE '%{$filter['value']}%'");
+                        $hasWhere = true;
+                    }
+                }else{
+                    if($hasWhere){
+                        $qb->andWhere("b.{$filter['key']} LIKE '%{$filter['value']}%'");
+                    }else{
+                        $qb->where("b.{$filter['key']} LIKE '%{$filter['value']}%'");
+                        $hasWhere = true;
+                    }
+                }
+            }
+        }
+        return $qb->setMaxResults(25)
+           ->getQuery()
+           ->getResult();
+    }
+    
     public function findBooksWithOneOrLessAuthorsSQL(): ? array
     {
         $entityManager = $this->getEntityManager();
@@ -67,61 +103,16 @@ class BookRepository extends ServiceEntityRepository
            ->getQuery()
            ->getResult();
     }
-    
-    public function findAllWithAuthors(): ?array
-    {
-        $entityManager = $this->getEntityManager();
-        $query = $entityManager->createQuery(
-            'SELECT b, a, GROUP_CONCAT(a.name SEPARATOR ', ')
-            FROM App\Entity\Book b
-            LEFT JOIN b.authors a
-            GROUP BY b.id
-            ORDER BY b.id DESC'
-        )
-        ->setMaxResults(30);
-        return $query->getResult();
-    }
 
 
-    public function test(Book $entity): ?array
+    public function findAllQueryBuilder($filter = '')
     {
-        return $entity->getAuthors()->toArray();
-        $entityManager = $this->getEntityManager();
-        $qb = $entityManager->createQueryBuilder();
-        $qb->update('App\Entity\Author','a')
-           ->innerJoin('a.books', 'b')
-           ->set('a.total_books', '3')
-           ->where('b.id = 440');
+        $qb = $this->createQueryBuilder('books');
+        if ($filter) {
+            $qb->andWhere('programmer.nickname LIKE :filter OR programmer.tagLine LIKE :filter')
+                ->setParameter('filter', '%'.$filter.'%');
+        }
+        return $qb;
     }
     
-    public function updateAuthorsTotalBooks(Book $entity): void
-    {
-        // $entityManager = $this->getEntityManager();
-        // $qb = $entityManager->createQueryBuilder();
-        // return $gb->update();
-    }
-//    /**
-//     * @return Book[] Returns an array of Book objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('b.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Book
-//    {
-//        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            xd
-//        ;
-//    }
 }

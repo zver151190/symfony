@@ -32,7 +32,7 @@
                     <td><div class="input-group input-group-sm"><input data-attribute="title" placeholder="Search by Title" class="tableSearch form-control border" onkeyup="tableFilter(event,this)" type="search"></div></td>
                     <td><div class="input-group input-group-sm"><input data-attribute="description" placeholder="Search by Description" class="tableSearch form-control border" onkeyup="tableFilter(event,this)" type="search"></div></td>
                     <td><div class="input-group input-group-sm"><input data-attribute="authors" placeholder="Search by Authors" class="tableSearch form-control border" onkeyup="tableFilter(event,this)" type="search"></div></td>
-                    <td><div class="input-group input-group-sm"><input data-attribute="publish_year" placeholder="Search by Publishing Year" class="tableSearch form-control border" onkeyup="tableFilter(event,this)" type="search"></div></td>
+                    <td><div class="input-group input-group-sm"><input data-attribute="publishYear" placeholder="Search by Publishing Year" class="tableSearch form-control border" onkeyup="tableFilter(event,this)" type="search"></div></td>
                     <td></td>
                     </tr>
             </thead>
@@ -80,7 +80,21 @@
                 var attribute = $(v).attr("data-attribute");
                 filters.push({"key":attribute,"value":search});
             });
-            console.log(filters);
+            
+            $.ajax({
+                url: "/books",
+                method: "POST",
+                data: {filters:filters},
+                success: function (data,status,xhr) {
+                    console.log(data)
+                    var div = $("<div></div>").html(data);
+                    $('tbody').html(div.find('tbody').html());
+                },
+                error: function (jqXhr, textStatus, errorMessage) { 
+                }
+                    
+            });
+        
             return false;
         }
     }

@@ -10,6 +10,7 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>Books</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,9 +23,10 @@
                                 <span class="badge rounded-pill bg-light text-dark">{{ book.title }}</span>
                             {% endfor %}
                         </td>
+                        <td class="align-middle"><a href="/authors/edit/{{author.id}}" class="btn btn-primary">Edit</a></td>
                     </tr>
                 {% else %}
-                    <p>No books have been found.</p>
+                    <p>No authors have been found.</p>
                 {% endfor %}
             </tbody>
         </table>

@@ -11,18 +11,11 @@
 <div class="container">
     <div class="card" style="width: 35rem;margin: 40px auto;">
         <div class="card-header">
-            Edit Book
+            Edit Author
         </div>
         <div class="card-body">
             <div id = "simpleform">
                 {% form_theme form 'bootstrap_5_layout.html.twig' %}
-                <div class="text-center">
-                {% if form.vars.value.cover is not null %}
-                    <img src="{{ form.vars.value.cover }}" height="250" class="mb-3" alt="book cover image"/>
-                {%else%}
-                    <img src="/public/uploads/image-landscape.svg" height="250" class="mb-3" alt="book cover image"/>
-                {% endif %}
-                </div>
                 {{ form_start(form) }}
                 {{ form_widget(form) }} 
                 {{ form_end(form) }} 
@@ -31,4 +24,3 @@
     </div>
 </div>
 {% endblock %}
-

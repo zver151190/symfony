@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 class BooksController extends AbstractController
 {
     private $em;
@@ -29,14 +30,25 @@ class BooksController extends AbstractController
        
     }
     
-    #[Route('/books', name: 'books', methods: ['GET','POST'])]
+    #[Route('/books', name: 'books', methods: ['GET'])]
     public function index(Request $request): Response
     {
         $books = $this->em->getRepository(Book::class)->findBy(array(), array('id' => 'DESC'),25);
         $book = new Book();
         $form = $this->createForm(BookFormType::class, $book);
         return $this->render('books/index.html.twig', [
-            'form' => $form->createView(),
+            'books' => $books,
+        ]);
+    }
+    
+    #[Route('/books', name: 'books_search', methods: ['POST'])]
+    public function search(Request $request): Response
+    {
+        $post = $request->request->all();
+        $filter = [];
+        if(isset($post['filters'])) $filter = $post['filters'];
+        $books = $this->em->getRepository(Book::class)->findByFilter($filter);
+        return $this->render('books/index.html.twig', [
             'books' => $books,
         ]);
     }
@@ -76,7 +88,7 @@ class BooksController extends AbstractController
     }
     
     #[Route("/books/edit/{id}", name:"books_edit")]
-    public function edit($id, Request $request, EventDispatcherInterface $eventDispatcher): Response
+    public function edit($id, Request $request): Response
     {
         
         $book = $this->em->getRepository(Book::class)->findOneBy(array('id' => $id));
