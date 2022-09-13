@@ -100,6 +100,15 @@ class Book
     {
         return $this->authors;
     }
+    
+    public function getAuthorsArray(): Array
+    {
+        $arr = [];
+        foreach($this->authors as $author){
+            $arr[] = $author->getName();
+        }
+        return $arr;
+    }
 
     public function addAuthor(Author $author): self
     {
