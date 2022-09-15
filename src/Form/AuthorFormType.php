@@ -34,7 +34,6 @@ class AuthorFormType extends AbstractType
                 'attr' => [
                     'size' => 15
                 ]
-                
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Save Changes',

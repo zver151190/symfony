@@ -38,6 +38,30 @@ class AuthorRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    
+    /**
+    * @return Author[] Returns an array of Books objects
+    */
+    public function findBooksByAuthor($id): array
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        return $qb->select('b')
+           ->from('App\Entity\Book', 'b')
+           ->leftJoin('b.authors', 'ba')
+           ->where('ba.id = :id')
+           ->setParameter(':id', $id)
+           ->getQuery()
+           ->getResult();
+        ;
+    }
+
+    public function emptyBooks($id): void
+    {
+        $qb = $this->createQueryBuilder('book_author');
+        $qb->delete('book_author')->where('author_id = :id')->setParameter(':id', $id);
+        echo $qb->getQuery()->getSql();
+    }
 
 //    /**
 //     * @return Author[] Returns an array of Author objects

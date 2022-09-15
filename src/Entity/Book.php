@@ -32,7 +32,7 @@ class Book
     #[Assert\Positive]
     private ?int $publishYear = null;
 
-    #[ORM\ManyToMany(targetEntity: Author::class, inversedBy: 'books')]
+    #[ORM\ManyToMany(targetEntity: Author::class, inversedBy: 'books', cascade: ["persist"])]
     private Collection $authors;
 
     public function __construct()
@@ -124,6 +124,10 @@ class Book
         $this->authors->removeElement($author);
 
         return $this;
+    }
+    
+    public function __toString(){
+        return $this->getTitle();
     }
 
 }

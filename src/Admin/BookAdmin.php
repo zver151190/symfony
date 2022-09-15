@@ -54,6 +54,7 @@ final class BookAdmin extends AbstractAdmin
         $datagrid->add('id');
         $datagrid->add('title');
         $datagrid->add('description');
+        $datagrid->add('authors');
         $datagrid->add('publish_year', DateRangeFilter::class);
     }
 
@@ -81,4 +82,5 @@ final class BookAdmin extends AbstractAdmin
         $show->add('authors');
         $show->add('publishYear');
     }
+    
 }

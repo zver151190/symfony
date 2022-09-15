@@ -55,7 +55,7 @@
                         </td>
                         <td class="align-middle">
                             {% for author in book.authors %}
-                                <span class="badge rounded-pill bg-light text-dark" onclick="location.href='/authors/{{ author.id }}'">{{ author.name }}</span>
+                                <span class="badge rounded-pill bg-light text-dark">{{ author.name }}</span>
                             {% endfor %}
                         </td>
                         <td class="align-middle"><div class="inlineEdit" data-type="number" data-id="{{ book.id }}" data-name="publishYear">{{ book.publishYear }}</div></td>

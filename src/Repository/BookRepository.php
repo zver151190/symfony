@@ -75,7 +75,7 @@ class BookRepository extends ServiceEntityRepository
            ->getResult();
     }
     
-    public function findBooksWithOneOrLessAuthorsSQL(): ? array
+    public function findBooksWithOneOrMoreAuthorsSQL(): ? array
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
@@ -83,14 +83,14 @@ class BookRepository extends ServiceEntityRepository
             FROM App\Entity\Book b
             LEFT JOIN b.authors ba
             GROUP BY b.id
-            HAVING counter < 2
+            HAVING counter > 2
             ORDER BY b.id DESC'
         )
         ->setMaxResults(25);
         return $query->getResult();
     }
     
-    public function findBooksWithOneOrLessAuthors(): ? array
+    public function findBooksWithOneOrMoresAuthors(): ? array
     {
         $entityManager = $this->getEntityManager();
         $qb = $entityManager->createQueryBuilder();
@@ -98,7 +98,7 @@ class BookRepository extends ServiceEntityRepository
            ->from('App\Entity\Book', 'b')
            ->leftJoin('b.authors', 'ba')
            ->groupBy('b.id')
-           ->having('counter < 2')
+           ->having('counter > 2')
            ->setMaxResults(25)
            ->getQuery()
            ->getResult();

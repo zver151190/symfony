@@ -20,11 +20,11 @@ class Author
     #[ORM\Column(length: 180)]
     private ?string $name = null;
 
-    #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'authors')]
+    #[ORM\ManyToMany(targetEntity: Book::class, mappedBy: 'authors', cascade: ["persist"])]
     private Collection $books;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $totalBooks = null;
+    private ?int $totalBooks = 0;
 
     public function __construct()
     {
@@ -55,6 +55,15 @@ class Author
     {
         return $this->books;
     }
+    
+    
+    public function emptyBooks(): void
+    {
+        $books = $this->getBooks();
+        foreach($books->toArray() as $book){
+            $book->removeAuthor($this);
+        }
+    }
 
     public function addBook(Book $book): self
     {
@@ -80,11 +89,30 @@ class Author
         return $this->totalBooks;
     }
 
+    public function updateTotalBooks(): void
+    {
+        $totalBooks = count($this->getBooks()); 
+        $this->setTotalBooks($totalBooks);
+    }
+    
     public function setTotalBooks(int $totalBooks): self
     {
         $this->totalBooks = $totalBooks;
 
         return $this;
+    }
+    
+    public function getBooksArray(): Array
+    {
+        $arr = [];
+        foreach($this->books as $book){
+            $arr[] = $book->getTitle();
+        }
+        return $arr;
+    }
+    
+    public function __toString(){
+        return $this->getName();
     }
     
 }
