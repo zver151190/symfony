@@ -1,0 +1,13 @@
+{% extends '@SonataAdmin/CRUD/base_list_field.html.twig' %}
+
+{% block field %}
+    <tr class="sonata-ba-view-container">
+        <th>{{ field_description.label }}</th>
+        <td>
+            {% if value is not null %}
+                <img src="{{ value }}" width="100"/>
+            {%endif%}
+            <input type="file" name="{{ field_description.name }}" {% if value is not empty %}value="{{ value }}" {% endif %}/>
+        </td>
+    </tr>
+{% endblock %}

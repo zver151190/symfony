@@ -16,10 +16,23 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints\File;
 use Sonata\AdminBundle\FieldDescription\FieldDescriptionInterface;
 use Sonata\AdminBundle\Form\Type\ModelAutocompleteType;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Sonata\DoctrineORMAdminBundle\Filter\DateRangeFilter;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
 
 final class BookAdmin extends AbstractAdmin
 {
+    
+    private $params;
+    private $slugger;
+
+    public function __construct(ParameterBagInterface $params, SluggerInterface $slugger)
+    {
+        $this->params = $params;
+        $this->slugger = $slugger;
+    }
+    
     protected function configureFormFields(FormMapper $form): void
     {
         $form->add('title', TextType::class);
@@ -78,9 +91,34 @@ final class BookAdmin extends AbstractAdmin
     {
         $show->add('id');
         $show->add('title');
-        $show->add('cover');
+        $show->add('cover',null,['template' => 'Admin/show_image.html.twig']);
         $show->add('authors');
         $show->add('publishYear');
     }
     
+    
+    
+    public function preUpdate($book): void
+    {
+        $newField = $this->getForm()->get('cover')->getData();
+        if($newField !== null){
+            $oldFile = str_replace('/public/uploads/','',$book->getCover());
+            $safeFilename = $this->slugger->slug($book->getTitle());
+            $newFilename = $safeFilename.'-'.uniqid().'.'.$newField->guessExtension();
+            try{
+                $newField->move(
+                    $this->params->get('book_cover_directory'),
+                    $newFilename
+                );
+                //Delete the old file
+                if(trim($oldFile) != "" && file_exists($this->params->get('book_cover_directory').$oldFile)){
+                    unlink($this->params->get('book_cover_directory').$oldFile);
+                }
+                //Save new as cover
+                $book->setCover('/public/uploads/' . $newFilename);
+            }catch(FileException $e){
+                  
+            }
+        }
+    }
 }

@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class BooksController extends AbstractController
 {
     private $em;
+    private $slugger;
     
     public function __construct(ManagerRegistry $doctrine, SluggerInterface $slugger) 
     {
@@ -91,53 +92,34 @@ class BooksController extends AbstractController
     public function edit($id, Request $request): Response
     {
         $book = $this->em->getRepository(Book::class)->findOneBy(array('id' => $id));
+        $oldFile = str_replace('/public/uploads/','',$book->getCover());
         $form = $this->createForm(BookFormType::class, $book);
-        // $form->handleRequest($request);
+        $form->handleRequest($request);
         $image = $form->get('cover')->getData();
-        
-                //Check if ajax
-        if($request->isXmlHttpRequest()) {
-            $book_arr = array(
-                'title' => $book->getTitle(),
-                'description' => $book->getDescription(),
-                'cover' => $book->getCover(),
-                'publishYear' => $book->getPublishYear(),
-            );
-
-            $form->submit($book_arr);
-            if($form->isSubmitted() && $form->isValid()){
-                dd('valid');
-            }else{
-                $string = (string) $form->getErrors(true, false);
-                dd($string);
-            }
-        }
         
         if($form->isSubmitted() && $form->isValid()) { 
             //Check if we passed a new cover image
             if($image){
-                if($book->getCover() !== null){
-                    $oldFile = str_replace('/public/uploads/','',$book->getCover());
-                    if(file_exists($this->getParameter('book_cover_directory').$oldFile)){
-                        $safeFilename = $this->slugger->slug($book->getTitle());
-                        $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
-                        try{
-                            $image->move(
-                                $this->getParameter('book_cover_directory'),
-                                $newFilename
-                            );
-                        }catch(FileException $e){
-                              return new Response($e->getMessage());
-                        }
-                        //Delete the old file
-                        unlink($this->getParameter('book_cover_directory').$oldFile);
-                        //Save new as cover
-                        $book->setCover('/public/uploads/' . $newFilename);
+                    $safeFilename = $this->slugger->slug($book->getTitle());
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+                    try{
+                        $image->move(
+                            $this->getParameter('book_cover_directory'),
+                            $newFilename
+                        );
+                    }catch(FileException $e){
+                        return new Response($e->getMessage());
                         
-                        $this->em->flush(); 
-                        return $this->redirectToRoute('books');
                     }
-                }
+                    //Delete the old file
+                    if(trim($oldFile) != "" && file_exists($this->getParameter('book_cover_directory').$oldFile)){
+                        unlink($this->getParameter('book_cover_directory').$oldFile);
+                    }
+                    //Save new as cover
+                    $book->setCover('/public/uploads/' . $newFilename);
+                        
+                    $this->em->flush(); 
+                    return $this->redirectToRoute('books');
             }else{
                 $this->em->flush(); 
                 return $this->render('books/edit.html.twig', [

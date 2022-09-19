@@ -50,9 +50,9 @@ class BookChangedListener
     {
         
         $entity = $args->getObject();
-        $oldAuthors = $this->getBookOldAuthors($entity);
         
         if ($entity instanceof Book) {
+            $oldAuthors = $this->getBookOldAuthors($entity);
             $newAuthors = [];
             foreach($entity->getAuthors() as $author){
                 $newAuthors[]= $author->getId();
