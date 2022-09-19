@@ -8,14 +8,11 @@ class AuthorChangedListener
 {
     public function postUpdate(LifecycleEventArgs $args): void
     {
+        //Check if this is a author
         $entity = $args->getObject();
-        $entityManager = $args->getObjectManager();
-        if(method_exists($entity,'getAuthors')){
-            foreach($entity->getAuthors() as $author){
-                $author->updateTotalBooks();
-            }
+        
+        if ($entity instanceof Author) {
+            dd($entity);
         }
-        $entityManager->persist($entity); 
-        $entityManager->flush();
     }
 }

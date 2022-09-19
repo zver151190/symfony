@@ -100,16 +100,18 @@
     }
     
     function updateBook(elem){
+
         var name = $(elem).parent().find('.inlineEdit').data('name');
         var value = $(elem).val(); 
         var id = $(elem).parent().find('.inlineEdit').data('id');
         $('#form_id').val(id);
         $('#form_'+name).val(value);
         var formData = new FormData();
+        formData.append('_token',$('meta[name="csrf-token"]').attr('content'));
         $(elem).parent().find('.inlineEdit').text($(elem).val())
         $.ajax({
                 url: "/books/edit/"+id,
-                method: "POST",
+                method: "PATCH",
                 enctype: 'multipart/form-data',
                 data: formData,
                 processData: false,

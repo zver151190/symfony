@@ -90,6 +90,24 @@ class BookRepository extends ServiceEntityRepository
         return $query->getResult();
     }
     
+    public function findBookAuthorsId($id): ? array
+    {
+        $entityManager = $this->getEntityManager();
+        $qb = $entityManager->createQueryBuilder();
+        $authors =  $qb->select('ba.id')
+           ->from('App\Entity\Book', 'b')
+           ->leftJoin('b.authors', 'ba')
+           ->where('b.id = '.$id)
+           ->getQuery()
+           ->getResult();
+         
+        $return = [];
+        foreach($authors as $author){
+            $return[] = $author['id'];
+        }
+        return $return;
+    }
+    
     public function findBooksWithOneOrMoresAuthors(): ? array
     {
         $entityManager = $this->getEntityManager();

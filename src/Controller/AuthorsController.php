@@ -54,23 +54,38 @@ class AuthorsController extends AbstractController
         //Get author by id we received
         $author = $this->em->getRepository(Author::class)->findOneBy(array('id' => $id));
         
+        //Get all author books
+        $authorBooks = $author->getBooks();
+        
+        //Save this value to compare if the value has been changed
+        //If this value has been changed - we need to update totalBooks counter
+        $oldAuthorBooks = clone($authorBooks);
+        
         //Load edit form from this author
         $form = $this->createForm(AuthorFormType::class, $author);
         $form->handleRequest($request);
 
         //Check if we submitted the form
         if($form->isSubmitted() && $form->isValid()) {
-            $books = $this->em->getRepository(Author::class)->findBooksByAuthor($id);
             
-            //Remove all books from the author
-            foreach($books as $book){
-                $book->removeAuthor($author);
+            //Check if the books has changed by finding if there is any difference between
+            //the old array adn the new and vice versa
+            if(array_diff($oldAuthorBooks->toArray(), $authorBooks->toArray()) ||
+                array_diff($authorBooks->toArray(), $oldAuthorBooks->toArray())
+            ){
+                //Remove all books from the author
+                foreach($oldAuthorBooks as $book){
+                    $book->removeAuthor($author);
+                }
+                
+                //Update the books author by calling the set method
+                //Because apparently the only the owning side can update ManyToMany relationship
+                foreach($authorBooks as $book){
+                    $book->addAuthor($author);
+                }
+            
             }
-            //Update the books author by calling the set method
-            //Because apparently the only the owning side can update ManyToMany relationship
-            foreach($author->getBooks() as $book){
-                $book->addAuthor($author);
-            }
+
             $this->em->flush(); 
             return $this->redirectToRoute('authors');
         }

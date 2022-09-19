@@ -90,11 +90,29 @@ class BooksController extends AbstractController
     #[Route("/books/edit/{id}", name:"books_edit")]
     public function edit($id, Request $request): Response
     {
-        
         $book = $this->em->getRepository(Book::class)->findOneBy(array('id' => $id));
         $form = $this->createForm(BookFormType::class, $book);
-        $form->handleRequest($request);
+        // $form->handleRequest($request);
         $image = $form->get('cover')->getData();
+        
+                //Check if ajax
+        if($request->isXmlHttpRequest()) {
+            $book_arr = array(
+                'title' => $book->getTitle(),
+                'description' => $book->getDescription(),
+                'cover' => $book->getCover(),
+                'publishYear' => $book->getPublishYear(),
+            );
+
+            $form->submit($book_arr);
+            if($form->isSubmitted() && $form->isValid()){
+                dd('valid');
+            }else{
+                $string = (string) $form->getErrors(true, false);
+                dd($string);
+            }
+        }
+        
         if($form->isSubmitted() && $form->isValid()) { 
             //Check if we passed a new cover image
             if($image){

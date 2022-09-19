@@ -39,52 +39,43 @@ class AuthorRepository extends ServiceEntityRepository
         }
     }
     
-    /**
-    * @return Author[] Returns an array of Books objects
-    */
-    public function findBooksByAuthor($id): array
+    //Subtructs 1 from author total book counter
+    public function subtractAuthorTotalBooks($id): void
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+             "UPDATE App\Entity\Author a
+              SET a.totalBooks = a.totalBooks - 1
+              WHERE a.id = '{$id}'"
+        );
+        $result = $query->execute();  
+    }
+    
+    
+    //Recalculate authors fiels totalBooks
+    public function updateTotalBooks($id): void
     {
         $entityManager = $this->getEntityManager();
         $qb = $entityManager->createQueryBuilder();
-        return $qb->select('b')
+        $total = $qb->select('COUNT(b.id) as total')
            ->from('App\Entity\Book', 'b')
            ->leftJoin('b.authors', 'ba')
            ->where('ba.id = :id')
            ->setParameter(':id', $id)
            ->getQuery()
+           ->setMaxResults(1)
            ->getResult();
-        ;
+         if(isset($total[0]['total'])) $total = $total[0]['total'];
+         else $total = 0;
+         
+         
+        $qb = $entityManager->createQueryBuilder();
+        $query = $qb->update('App\Entity\Author', 'a')
+                ->set('a.totalBooks', ':total')
+                ->where('a.id = :id')
+                ->setParameter('total', $total)
+                ->setParameter('id', $id)
+                ->getQuery();
+        $result = $query->execute();
     }
-
-    public function emptyBooks($id): void
-    {
-        $qb = $this->createQueryBuilder('book_author');
-        $qb->delete('book_author')->where('author_id = :id')->setParameter(':id', $id);
-        echo $qb->getQuery()->getSql();
-    }
-
-//    /**
-//     * @return Author[] Returns an array of Author objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Author
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

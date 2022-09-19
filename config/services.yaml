@@ -28,6 +28,7 @@ services:
         class: App\EventListener\BookChangedListener
         tags:
             - { name: doctrine.event_listener, entity: App\Entity\Book, event: postUpdate }
+            - { name: doctrine.event_listener, entity: App\Entity\Book, event: preUpdate }
             - { name: doctrine.event_listener, entity: App\Entity\Book, event: postPersist }
         
     admin.books:
